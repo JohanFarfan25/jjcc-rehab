@@ -227,8 +227,7 @@
         }
 
         .header {
-            background-color: #007bff;
-            color: white;
+            color: black;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -304,7 +303,6 @@
         }
 
         .add-report-form button {
-            background-color: #007bff;
             color: white;
             padding: 10px 15px;
             border: none;
@@ -944,7 +942,7 @@
                             <!-- Cabecera -->
                             <div class="header">
                                 <h1>Reportes de Progreso - Paciente: Juan Pérez</h1>
-                                <button onclick="openAddReportForm()">Agregar Reporte</button>
+                                <button  class="btn btn-base" onclick="openAddReportForm()">Agregar Reporte</button>
                             </div>
 
                             <!-- Formulario para agregar reporte -->
@@ -956,8 +954,8 @@
                                 <input type="date" id="report-date" required>
                                 <textarea id="report-notes" rows="4" placeholder="Observaciones Adicionales"
                                     required></textarea>
-                                <button onclick="addReport()">Agregar Reporte</button>
-                                <button onclick="closeAddReportForm()">Cancelar</button>
+                                <button class="btn btn-base"  onclick="addReport()">Agregar Reporte</button>
+                                <button  class="btn btn-info" onclick="closeAddReportForm()">Cancelar</button>
                             </div>
 
                             <!-- Sección de reportes -->
