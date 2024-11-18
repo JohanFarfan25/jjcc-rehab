@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>JJ-CC Payments  </title>
+        <!-- inject:css -->
+        <link rel="stylesheet" href="../../dist/css/vendor.styles.css">
+        <link rel="stylesheet" href="../../dist/css/demo/light-template.css">
+        <!-- endinject -->
+        <link rel="shortcut icon" href="../../dist/images/favicon.png"/>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <style>
+            .position-relative {
+                position: relative;
+            }
+    
+            .count {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background-color: red;
+                color: white;
+                border-radius: 50%;
+                padding: 1px 4px;
+                font-size: 10px;
+                font-weight: bold;
+                min-width: 16px;
+                height: 16px;
+                text-align: center;
+                line-height: 14px;
+            }
+
+       /*********** Estilos del ícono de mensajes *************/
+       .message-icon-container {
+            bottom: 20px;
+            right: 20px;
+            position: fixed;
+            z-index: 1000;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .message-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            font-size: 12px;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-weight: bold;
+        }
+
+        /* Estilos del modal */
+        .chat-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-modal-header {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-modal-body {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .chat-modal-footer {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .send-message-btn {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Contenedor del ícono */
+        .message-icon-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .message-icon-container:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilo del ícono */
+        .message-icon-container i {
+            font-size: 1.8em;
+            /* Ajusta el tamaño */
+            line-height: 1;
+        }
+
+        /* Estilo del contador */
+        .message-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 50%;
+            padding: 2px 6px;
+            text-align: center;
+        }
+
+        /* Estilo del mensaje emergente */
+        .message-popup {
+            text-align: center;
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background-color: #ffffff;
+            /* Fondo blanco sólido */
+            color: #007bff;
+            /* Color de texto */
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            font-weight: bold;
+            max-width: 250px;
+            z-index: 999;
+            animation: fadeInOut 5s ease-out;
+        }
+
+        /* Animación para el popup */
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+        }
+
+        /*********** Estilos del ícono de mensajes *************/
+        </style>
+    </head>
+    <body>
+        <div class="main-container">
+            <div class="container-fluid page-body-wrapper">
+            <!--Notificaciones -->
+            <div class="profile-overlay">
+                <div class="profile-header">
+                    <div class="profile-head">|
+                        <h4>Profile</h4>
+                        <i data-feather="log-out" class="profile-close"></i>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-pic">
+                            <img src="./dist/images/avatars/user-2.jpg" alt="Profile Picture" />
+                        </div>
+                        <div class="profile-detail">
+                            <h4 class="name">Jason Banks</h4>
+                            <p class="designation">Full Stack Developer</p>
+                            <div class="email">
+                                <i class="icon" data-feather="mail"></i>
+                                <a href="#">jason.banks@domain.com</a>
+                            </div>
+                            <div class="username">
+                                <i class="icon" data-feather="user"></i>
+                                <a href="#">@jason.banks</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-body">
+                    <div class="body-wrapper">
+                        <div class="project-stat">
+                            <div class="widget-2">
+                                <h5 class="widget-2-header">Project updates</h5>
+                                <div class="widget-2-items">
+                                    <div class="widget-2-item">
+                                        <div class="widget-2-info">
+                                            <a class="widget-2-title" href="#">Jinx Desktop App</a>
+                                            <div class="widget-2-other-info">UI/UX, C++, Java</div>
+                                        </div>
+                                        <div class="widget-2-stat">
+                                            <div class="widget-2-stat-figure">+80.1%</div>
+                                            <div class="progress progress-md">
+                                                <div class="progress-bar bg-primary" role="progressbar"
+                                                    style="width: 70.5%;" aria-valuenow="70.5" aria-valuemin="0"
+                                                    aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="widget-2-item">
+                                        <div class="widget-2-info">
+                                            <a class="widget-2-title" href="#">Social Shares</a>
+                                            <div class="widget-2-other-info">C#, Angular, HTML5</div>
+                                        </div>
+                                        <div class="widget-2-stat">
+                                            <div class="widget-2-stat-figure">+80.1%</div>
+                                            <div class="progress progress-md">
+                                                <div class="progress-bar bg-success" role="progressbar"
+                                                    style="width: 70.5%;" aria-valuenow="70.5" aria-valuemin="0"
+                                                    aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="widget-2-item">
+                                        <div class="widget-2-info">
+                                            <a class="widget-2-title" href="#">eBook Downloads</a>
+                                            <div class="widget-2-other-info">Angular 8, HTML 5</div>
+                                        </div>
+                                        <div class="widget-2-stat">
+                                            <div class="widget-2-stat-figure">+80.1%</div>
+                                            <div class="progress progress-md">
+                                                <div class="progress-bar bg-warning" role="progressbar"
+                                                    style="width: 70.5%;" aria-valuenow="70.5" aria-valuemin="0"
+                                                    aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="widget-2-item">
+                                        <div class="widget-2-info">
+                                            <a class="widget-2-title" href="#">Account Creations</a>
+                                            <div class="widget-2-other-info">Php, Laravel</div>
+                                        </div>
+                                        <div class="widget-2-stat">
+                                            <div class="widget-2-stat-figure">+80.1%</div>
+                                            <div class="progress progress-md">
+                                                <div class="progress-bar bg-danger" role="progressbar"
+                                                    style="width: 70.5%;" aria-valuenow="70.5" aria-valuemin="0"
+                                                    aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="widget-1">
+                                <h5 class="widget-1-header">Task list</h5>
+                                <div class="widget-1-items">
+                                    <div class="widget-1-item">
+                                        <div class="widget-1-info">
+                                            <a class="widget-1-title" href="#">Development FTP require</a>
+                                            <div class="widget-1-other-info">26 Oct 2018 - 1 Hrs</div>
+                                        </div>
+                                        <div class="widget-1-actions">
+                                            <a href="#" class="primary"><i data-feather="check"></i></a>
+                                            <a href="#" class="secondary"><i data-feather="edit-2"></i></a>
+                                            <a href="#" class="secondary"><i data-feather="trash-2"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="widget-1-item">
+                                        <div class="widget-1-info">
+                                            <a class="widget-1-title" href="#">Designs approval</a>
+                                            <div class="widget-1-other-info">26 Oct 2018 - 30 Min</div>
+                                        </div>
+                                        <div class="widget-1-actions">
+                                            <a href="#" class="primary"><i data-feather="check"></i></a>
+                                            <a href="#" class="secondary"><i data-feather="edit-2"></i></a>
+                                            <a href="#" class="secondary"><i data-feather="trash-2"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="widget-1-item">
+                                        <div class="widget-1-info">
+                                            <a class="widget-1-title" href="#">Meeting with designers</a>
+                                            <div class="widget-1-other-info">26 Oct 2018 - 1.5 Hrs</div>
+                                        </div>
+                                        <div class="widget-1-actions">
+                                            <a href="#" class="primary"><i data-feather="check"></i></a>
+                                            <a href="#" class="secondary"><i data-feather="edit-2"></i></a>
+                                            <a href="#" class="secondary"><i data-feather="trash-2"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="widget-1-item">
+                                        <div class="widget-1-info">
+                                            <a class="widget-1-title" href="#">Upload application for approval</a>
+                                            <div class="widget-1-other-info">26 Oct 2018 - 1 Hrs</div>
+                                        </div>
+                                        <div class="widget-1-actions">
+                                            <a href="#" class="primary"><i data-feather="check"></i></a>
+                                            <a href="#" class="secondary"><i data-feather="edit-2"></i></a>
+                                            <a href="#" class="secondary"><i data-feather="trash-2"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="widget-1-item">
+                                        <div class="widget-1-info">
+                                            <a class="widget-1-title" href="#">Resolve application bugs</a>
+                                            <div class="widget-1-other-info">26 Oct 2018 - 2 Hrs</div>
+                                        </div>
+                                        <div class="widget-1-actions">
+                                            <a href="#" class="primary"><i data-feather="check"></i></a>
+                                            <a href="#" class="secondary"><i data-feather="edit-2"></i></a>
+                                            <a href="#" class="secondary"><i data-feather="trash-2"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-overlay">
+                <div class="settings-header">
+                    <h4>Configurations</h4>
+                </div>
+                <i data-feather="arrow-left-circle" class="setting-close"></i>
+                <div class="settings-body">
+                    <form class="config-container form">
+                        <div class="config-file">
+                            <h5>File Sharing</h5>
+                            <ul class="config-list">
+                                <li class="config-item form-group-xs row">
+                                    <label class="col-8 col-form-label">Enable auto upload:</label>
+                                    <div class="col-4 text-right">
+                                        <a href="#" class="disable">
+                                            <i class="config-icon" data-feather="upload-cloud"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li class="config-item form-group-xs row">
+                                    <label class="col-8 col-form-label">Enable file sharing:</label>
+                                    <div class="col-4 text-right">
+                                        <a href="#" class="enable">
+                                            <i class="config-icon" data-feather="share-2"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li class="config-item form-group-xs row">
+                                    <label class="col-8 col-form-label">Enable auto download:</label>
+                                    <div class="col-4 text-right">
+                                        <a href="#" class="disable">
+                                            <i class="config-icon" data-feather="download-cloud"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="separator"></div>
+                        <div class="config-notify">
+                            <h5>Notification</h5>
+                            <ul class="config-list">
+                                <li class="config-item form-group-xs row">
+                                    <label class="col-8 col-form-label">Notify when receive email:</label>
+                                    <div class="col-4 text-right">
+                                        <a href="#" class="disable">
+                                            <i class="config-icon" data-feather="bell-off"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li class="config-item form-group-xs row">
+                                    <label class="col-8 col-form-label">Receive calls in meeting:</label>
+                                    <div class="col-4 text-right">
+                                        <a href="#" class="disable">
+                                            <i class="config-icon" data-feather="phone-off"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li class="config-item form-group-xs row">
+                                    <label class="col-8 col-form-label">Update on task completion:</label>
+                                    <div class="col-4 text-right">
+                                        <a href="#" class="enable">
+                                            <i class="config-icon" data-feather="thumbs-up"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="separator"></div>
+                        <div class="config-general">
+                            <h5>Reporting</h5>
+                            <ul class="config-list">
+                                <li class="config-item form-group-xs row">
+                                    <label class="col-8 col-form-label">Auto generate reports:</label>
+                                    <div class="col-4 text-right">
+                                        <a href="#" class="disable">
+                                            <i class="config-icon" data-feather="file-minus"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li class="config-item form-group-xs row">
+                                    <label class="col-8 col-form-label">Generate customer reports:</label>
+                                    <div class="col-4 text-right">
+                                        <a href="#" class="disable">
+                                            <i class="config-icon" data-feather="user-check"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                                <li class="config-item form-group-xs row">
+                                    <label class="col-8 col-form-label">Generate order reports:</label>
+                                    <div class="col-4 text-right">
+                                        <a href="#" class="enable">
+                                            <i class="config-icon" data-feather="shopping-cart"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+            <div class="email-overlay">
+                <div class="email">
+                    <div class="email-list-header">
+                        <h4>Email <small class="text-muted">12 New</small></h4>
+                        <a href="#" class="btn btn-soft-base overlay-close"><i data-feather="x"></i></a>
+                    </div>
+                    <div class="email-list-wrapper">
+                        <div class="email-list-scroll-container">
+                            <ul class="email-list email-list-scroll">
+                                <li class="email-list-item">
+                                    <span class="pro-pic">
+                                        <img src="./dist/images/avatars/user-1.jpg" alt="Profile Picture">
+                                        <a href="#" class="attachment">
+                                            <i data-feather="paperclip"></i>
+                                        </a>
+                                    </span>
+                                    <div class="email-content">
+                                        <div class="recipient">
+                                            <p class="recipient-name">Ronald Morris</p>
+                                            <p class="recipient-time">11:50 AM</p>
+                                        </div>
+                                        <a href="#" class="email-subject">Prepare Mockups as per scope!<i
+                                                class="starred">&nbsp;</i></a>
+                                        <div class="email-text">
+                                            Hello Ronald, Please prepare mockups according to the spec documentation...
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="email-list-item">
+                                    <span class="pro-pic">
+                                        <img src="./dist/images/avatars/user-2.jpg" alt="Profile Picture">
+                                    </span>
+                                    <div class="email-content">
+                                        <div class="recipient">
+                                            <p class="recipient-name">Poul Smith</p>
+                                            <p class="recipient-time">09:15 AM</p>
+                                        </div>
+                                        <a href="#" class="email-subject">Final demo approval!</a>
+                                        <div class="email-text">
+                                            Hi, My team has reviewed the demo on development server...
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="email-list-item active">
+                                    <span class="pro-pic">
+                                        <img src="./dist/images/company/company-1.jpg" alt="Profile Picture">
+                                        <a href="#" class="attachment">
+                                            <i data-feather="paperclip"></i>
+                                        </a>
+                                    </span>
+                                    <div class="email-content">
+                                        <div class="recipient">
+                                            <p class="recipient-name">Lex Luther</p>
+                                            <p class="recipient-time">08:30 AM</p>
+                                        </div>
+                                        <a href="#" class="email-subject">Demo design submission!<i
+                                                class="starred">&nbsp;</i></a>
+                                        <div class="email-text">
+                                            Hello Lex, Please prepare designs according to the spec documentation...
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="email-list-item">
+                                    <span class="pro-pic">
+                                        <img src="./dist/images/company/company-2.jpg" alt="Profile Picture">
+                                        <a href="#" class="attachment">
+                                            <i data-feather="paperclip"></i>
+                                        </a>
+                                    </span>
+                                    <div class="email-content">
+                                        <div class="recipient">
+                                            <p class="recipient-name">Brad Pitt</p>
+                                            <p class="recipient-time">12:50 PM</p>
+                                        </div>
+                                        <a href="#" class="email-subject">Development status on the modules!<i
+                                                class="starred">&nbsp;</i></a>
+                                        <div class="email-text">
+                                            Hello Brad, Please prepare mockups according to the spec documentation...
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="email-list-item">
+                                    <span class="pro-pic">
+                                        <img src="./dist/images/company/company-3.jpg" alt="Profile Picture">
+                                        <a href="#" class="attachment">
+                                            <i data-feather="paperclip"></i>
+                                        </a>
+                                    </span>
+                                    <div class="email-content">
+                                        <div class="recipient">
+                                            <p class="recipient-name">Tommy Clark</p>
+                                            <p class="recipient-time">02:10 PM</p>
+                                        </div>
+                                        <a href="#" class="email-subject">Review attached bug list!<i
+                                                class="starred">&nbsp;</i></a>
+                                        <div class="email-text">
+                                            Hello Tommy, Please prepare mockups according to the spec documentation...
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="email-list-item">
+                                    <span class="pro-pic">
+                                        <img src="./dist/images/company/company-4.jpg" alt="Profile Picture">
+                                        <a href="#" class="attachment">
+                                            <i data-feather="paperclip"></i>
+                                        </a>
+                                    </span>
+                                    <div class="email-content">
+                                        <div class="recipient">
+                                            <p class="recipient-name">Alison Gram</p>
+                                            <p class="recipient-time">04:50 PM</p>
+                                        </div>
+                                        <a href="#" class="email-subject">Prepare Mockups as per scope!<i
+                                                class="starred">&nbsp;</i></a>
+                                        <div class="email-text">
+                                            Hello Alison, Please prepare mockups according to the spec documentation...
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="email-list-item">
+                                    <span class="pro-pic">
+                                        <img src="./dist/images/company/company-1.jpg" alt="Profile Picture">
+                                        <a href="#" class="attachment">
+                                            <i data-feather="paperclip"></i>
+                                        </a>
+                                    </span>
+                                    <div class="email-content">
+                                        <div class="recipient">
+                                            <p class="recipient-name">Pam Agile</p>
+                                            <p class="recipient-time">05:00 PM</p>
+                                        </div>
+                                        <a href="#" class="email-subject">Mobile application meeting cancel!<i
+                                                class="starred">&nbsp;</i></a>
+                                        <div class="email-text">
+                                            Hello Pam, Please prepare mockups according to the spec documentation...
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="notification-overlay">
+                <div class="notify-header">
+                    <h4>Notificaciones</h4>
+                    <a href="#" class="btn btn-soft-base overlay-close"><i data-feather="x"></i></a>
+                </div>
+                <div class="notify-body">
+                    <ul class="notify-list">
+                        <li class="notify-item ">
+                            <div class="notify-thumbnail">
+                                <div class="notify-icon">
+                                    <img src="../../dist/images/avatars/user-1.jpg" alt="Company Logo" />
+                                </div>
+                            </div>
+                            <div class="notify-item-content">
+                                <span class="notify-primary"> Jhonatan Perez</span>
+                                <span class="notify-secondary">Hola Me podrias dar info de las promociones de este mes </span>
+                                <small>Justo ahora</small>
+                            </div>
+                        </li>
+                        <li class="notify-item ">
+                            <div class="notify-thumbnail">
+                                <div class="notify-icon">
+                                    <img src="../../dist/images/avatars/user-2.jpg" alt="Company Logo" />
+                                </div>
+                            </div>
+                            <div class="notify-item-content">
+                                <span class="notify-primary"> Wilson Blanco</span>
+                                <span class="notify-secondary">Me puedes agendar un cita para el martes a primera hora?</span>
+                                <small>Justo ahora</small>
+                            </div>
+                        </li>
+                        <li class="notify-item ">
+                            <div class="notify-thumbnail">
+                                <div class="notify-icon">
+                                    <img src="../../dist/images/avatars/user-3.jpg" alt="User Logo" />
+                                </div>
+                            </div>
+                            <div class="notify-item-content">
+                                <span class="notify-primary">Camila Sierra</span>
+                                <span class="notify-secondary">Me siento un poco adolorida de mi espalda</span>
+                                <small>Justo ahora</small>
+                            </div>
+                        </li>
+                        <li class="notify-item">
+                            <div class="notify-thumbnail">
+                                <div class="notify-icon">
+                                    <img src="../../dist/images/avatars/user-4.jpg" alt="User Logo" />
+                                </div>
+                            </div>
+                            <div class="notify-item-content">
+                                <span class="notify-primary"> Johan Farfán</span>
+                                <span class="notify-secondary">Me confirmas si realizo al pago, ya en el banco se realizo el descuento,
+                                    es para agendar un cita.
+                                </span>
+                                <small>Ayer</small>
+                            </div>
+                        </li>
+                        <li class="notify-item">
+                            <div class="notify-thumbnail">
+                                <div class="notify-icon">
+                                    <img src="../../dist/images/avatars/user-5.jpg" alt="User Logo" />
+                                </div>
+                            </div>
+                            <div class="notify-item-content">
+                                <span class="notify-primary">Esteban Sierra</span>
+                                <span class="notify-secondary">Me comprometo a realizar el pago el día de hoy</span>
+                                <small>2 días atras</small>
+                            </div>
+                        </li>
+                        <li class="notify-item">
+                            <div class="notify-thumbnail">
+                                <div class="notify-icon bg-soft-success rounded-circle">
+                                    <i data-feather="send" class="text-success"></i>
+                                </div>
+                            </div>
+                            <div class="notify-item-content">
+                                <span class="notify-primary">Cita de rehabilitación</span>
+                                <span class="notify-secondary">Te asignaron una cita de rehabilitación mañana a las 10:00am</span>
+                                <small>3 días attras</small>
+                            </div>
+                        </li>
+                        <li class="notify-item">
+                            <div class="notify-thumbnail">
+                                <div class="notify-icon bg-soft-info rounded-circle">
+                                    <i data-feather="send" class="text-info"></i>
+                                </div>
+                            </div>
+                            <div class="notify-item-content">
+                                <span class="notify-primary">Cita de rehabilitación</span>
+                                <span class="notify-secondary">Te asignaron una cita de rehabilitación mañana a las 01:00pm</span>
+                                <small>3 días attras</small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="sidebar-overlay"></div>
+            <!-- Notificaciones -->
+                <nav class="navbar-container flex-row" id="navbar">
+                    <div class="primary">
+						<ul class="nav nav-middle">
+							<li class="nav-item">
+								<a class="nav-link active" href="../dashboards/index.html">
+									<i data-feather="home"></i>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="../payments/payments.html">
+									<i data-feather="shopping-cart"></i>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="../history/histories.html">
+									<i data-feather="user"></i>
+								</a>
+							</li>
+                            <li class="nav-item position-relative">
+                                <a class="nav-link" id="notificationToolbar" href="#">
+                                    <i data-feather="bell"></i>
+                                    <span class="count">7</span>
+                                </a>
+                            </li>
+						</ul>
+                    </div>
+					<div class="secondary">
+						<div class="sub-header">
+							<a class="brand-logo" href="../dashboards/index.html">
+								<img src="../../dist/images/light-logo-mb.png" width="50%" alt="JJ-CC" title="JJ-CC" />
+							</a>
+							<h4>JJ-CC REHAB </h4>
+						</div>
+						<div class="nav-wrapper">
+							<ul class="nav">
+								<li class="nav-header" id="userGreeting">Hola</li>
+								<li class="nav-item">
+									<a class="nav-link" href="../../index.html" aria-controls="ui-widget">
+										<i data-feather="home" class="menu-icon"></i>
+										<span class="menu-title">Dashboard</span>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="../calendar/calendar.html" aria-controls="ui-widget">
+										<i data-feather="calendar" class="menu-icon"></i>
+										<span class="menu-title">Citas</span>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="../history/histories.html"
+										aria-controls="ui-widget">
+										<i data-feather="file-minus" class="menu-icon"></i>
+										<span class="menu-title">Historias Clínicas</span>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" href="../history/register.html" aria-controls="ui-widget">
+										<i data-feather="file-text" class="menu-icon"></i>
+										<span class="menu-title">Registro de tratamientos </span>
+									</a>
+								</li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="../progres/progres.html" aria-controls="ui-widget">
+                                        <i data-feather="trending-up" class="menu-icon"></i>
+                                        <span class="menu-title">Registro de Progresos </span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="./payments.html">
+                                        <i data-feather="shopping-cart" class="menu-icon"></i>
+                                        <span class="menu-title">Facturación y pagos </span>
+                                    </a>
+                                </li>
+								<li class="nav-item">
+									<a class="nav-link" href="../loguin/login.html" id="logOut">
+										<i data-feather="log-out" class="menu-icon"></i>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+                </nav>
+                <!-- partial -->
+                <div class="main-panel">
+                    <div class="content-wrapper">
+                        <!-- Content Place Here -->
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="card card-margin">
+                                    <div class="card-body p-0">
+                                        <div class="widget-24">
+                                            <div class="widget-24-body">
+                                                <div class="widget-24-content">
+                                                    <div class="widget-24-title">Ventas por estado</div>
+                                                    <span class="widget-24-figure">12,398</span>
+                                                </div>
+                                                <div class="widget-24-chart">
+                                                    <canvas id="revenue-graph-12" width="100" height="50"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="card card-margin">
+                                    <div class="card-body p-0">
+                                        <div class="widget-24">
+                                            <div class="widget-24-body">
+                                                <div class="widget-24-content">
+                                                    <div class="widget-24-title">Ventas por estado</div>
+                                                    <span class="widget-24-figure">12,398</span>
+                                                </div>
+                                                <div class="widget-24-chart">
+                                                    <canvas id="revenue-graph-11" width="100" height="50"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="card card-margin">
+                                    <div class="card-body p-0">
+                                        <div class="widget-24">
+                                            <div class="widget-24-body">
+                                                <div class="widget-24-content">
+                                                    <div class="widget-24-title">Ventas por estado</div>
+                                                    <span class="widget-24-figure">12,398</span>
+                                                </div>
+                                                <div class="widget-24-chart">
+                                                    <canvas id="revenue-graph-13" width="100" height="50"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="card card-margin">
+                                    <div class="card-body p-0">
+                                        <div class="widget-24">
+                                            <div class="widget-24-body">
+                                                <div class="widget-24-content">
+                                                    <div class="widget-24-title">Ventas por estado</div>
+                                                    <span class="widget-24-figure">12,398</span>
+                                                </div>
+                                                <div class="widget-24-chart">
+                                                    <canvas id="revenue-graph-14" width="100" height="50"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="tab-content p-0 mb-2" id="nav-tabContent2">
+                                <div class="tab-pane fade show active" id="nav-all" role="tabpanel" aria-labelledby="nav-tab-all">
+                                    <div class="table-responsive">
+                                        <table class="table widget-25">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <div class="string-check string-check-soft-primary">
+                                                            <input type="checkbox" class="form-check-input" id="chk0">
+                                                            <label class="string-check-label" for="chk0"></label>
+                                                        </div>
+                                                    </th>
+                                                    <th>Orden</th>
+                                                    <th>Creado</th>
+                                                    <th>Usuario</th>
+                                                    <th>Estado del pago</th>
+                                                    <th>valor</th>
+                                                    <th>Ganancia</th>
+                                                    <th>Estado</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <div class="string-check string-check-soft-primary">
+                                                            <input type="checkbox" class="form-check-input" id="chk2">
+                                                            <label class="string-check-label" for="chk2"></label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-id">
+                                                            <a href="#">123 0191</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-date">Aug 1, 2024</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-user">
+                                                            <img src="../../dist/images/avatars/user-5.jpg" alt="Customer" />
+                                                            <a href="#">Johan Farfán</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-fulfillment">
+                                                            <span class="badge badge-success">Completo</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-amount">$809.00</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-profit">$102.10</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-update">
+                                                            Hoy
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="string-check string-check-soft-primary">
+                                                            <input type="checkbox" class="form-check-input" id="chk3">
+                                                            <label class="string-check-label" for="chk3"></label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-id">
+                                                            <a href="#">982 0191</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-date">Aug 1, 2024</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-user">
+                                                            <img src="../../dist/images/avatars/user-3.jpg" alt="Customer" />
+                                                            <a href="#">Camila Pacheco</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-fulfillment">
+                                                            <span class="badge badge-warning">Pendiente</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-amount">$1,209.00</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-profit">$201.19</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-update">
+                                                            Hoy
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="string-check string-check-soft-primary">
+                                                            <input type="checkbox" class="form-check-input" id="chk4">
+                                                            <label class="string-check-label" for="chk4"></label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-id">
+                                                            <a href="#">261 9821</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-date">Jul 28, 2024</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-user">
+                                                            <img src="../../dist/images/avatars/user-2.jpg" alt="Customer" />
+                                                            <a href="#">Wilson Blanco</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-fulfillment">
+                                                            <span class="badge badge-info">En progreso</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-amount">$1,209.00</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-profit">$201.19</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-update">Ayer</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="string-check string-check-soft-primary">
+                                                            <input type="checkbox" class="form-check-input" id="chk5">
+                                                            <label class="string-check-label" for="chk5"></label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-id">
+                                                            <a href="#">142 8741</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-date">Jul 25, 2024</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-user">
+                                                            <img src="../../dist/images/avatars/user-4.jpg" alt="Customer" />
+                                                            <a href="#">Esteban Sierra</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-fulfillment">
+                                                            <span class="badge badge-success">Completo</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-amount">$1,209.00</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-profit">$201.19</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-update">Jul 29, 2024</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="string-check string-check-soft-primary">
+                                                            <input type="checkbox" class="form-check-input" id="chk6">
+                                                            <label class="string-check-label" for="chk6"></label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-id">
+                                                            <a href="#">641 8162</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-date">Jul 22, 2024</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-user">
+                                                            <img src="../../dist/images/avatars/user-6.jpg" alt="Customer" />
+                                                            <a href="#">Julia Norm</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-fulfillment">
+                                                            <span class="badge badge-warning">Pendiente</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-amount">$1,209.00</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-profit">$201.19</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-update">Jul 28, 2024</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="string-check string-check-soft-primary">
+                                                            <input type="checkbox" class="form-check-input" id="chk7">
+                                                            <label class="string-check-label" for="chk7"></label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-id">
+                                                            <a href="#">862 6124</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-date">Jul 20, 2024</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-user">
+                                                            <img src="../../dist/images/avatars/user-7.jpg" alt="Customer" />
+                                                            <a href="#">Sam Bourn</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-fulfillment">
+                                                            <span class="badge badge-base">Pendiente</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-amount">$1,209.00</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-profit">$201.19</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-update">Jul 27, 2024</div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div class="string-check string-check-soft-primary">
+                                                            <input type="checkbox" class="form-check-input" id="chk8">
+                                                            <label class="string-check-label" for="chk8"></label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-id">
+                                                            <a href="#">198 8152</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-date">Jul 18, 2024</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-user">
+                                                            <img src="../../dist/images/avatars/user-8.jpg" alt="Customer" />
+                                                            <a href="#">Julia Bond</a>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-fulfillment">
+                                                            <span class="badge badge-danger">Rechazada</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-amount">$1,209.00</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-profit">$201.19</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="widget-25-order-update">Jul 25, 2024</div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        <!--******* chatbot ***********-->
+                <!-- Contenedor del ícono -->
+                <div class="message-icon-container position-fixed" id="robotIcon">
+                    <i class="fas fa-robot" id="chatIcon"></i>
+                </div>
+
+                <!-- Modal de mensajería -->
+                <div class="chat-modal" id="chatModal">
+                    <div class="chat-modal-content">
+                        <div class="chat-modal-header">
+                            <h4>Chatbot</h4>
+                            <button class="close-modal" id="closeChat">&times;</button>
+                        </div>
+                        <div class="chat-modal-body" id="chatBody">
+                            <p>Bienvenido al chat. ¿En qué puedo ayudarte?</p>
+                        </div>
+                        <div class="chat-modal-footer">
+                            <input type="text" placeholder="Escribe un mensaje..." class="chat-input" id="userMessage" />
+                            <button class="send-message-btn" id="sendMessage">Enviar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenedor del mensaje emergente -->
+                <div class="message-popup" id="messagePopup">
+                    ¿Necesitas ayuda inmediata? Si el problema es urgente, puedes contactarnos directamente a nuestro chat
+                </div>
+        <!--******* chatbot ***********-->
+                    <div id="footer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- inject:js -->
+        <script src="../../dist/js/vendor.base.js"></script>
+        <script src="../../dist/js/vendor.bundle.js"></script>
+        <!-- endinject -->
+        <!-- Custom js for this page-->
+        <script src="../../dist/js/components/light-double-sidebar/common-msb.js"></script>
+        <script src="../../dist/js/vendor-override/tooltip.js"></script>
+        <script src="../../dist/js/components/order-list.js"></script>
+        <!-- End custom js for this page-->
+        <script>
+    		$(document).ready(function () {
+
+ 	        // SECCION DEL CHAT BOT
+             const chatIcon = document.getElementById('chatIcon');
+            const chatModal = document.getElementById('chatModal');
+            const closeChat = document.getElementById('closeChat');
+            const chatBody = document.getElementById('chatBody');
+            const userMessage = document.getElementById('userMessage');
+            const sendMessageButton = document.getElementById('sendMessage');
+            const messagePopup = document.getElementById('messagePopup');
+
+            // Abrir modal
+            chatIcon.addEventListener('click', () => {
+                chatModal.style.display = 'flex';
+            });
+
+            // Cerrar modal
+            closeChat.addEventListener('click', () => {
+                chatModal.style.display = 'none';
+            });
+
+            // Opcional: cerrar modal al hacer clic fuera del contenido
+            chatModal.addEventListener('click', (event) => {
+                if (event.target === chatModal) {
+                    chatModal.style.display = 'none';
+                }
+            });
+
+            // Mostrar mensaje emergente cada 5 segundos
+            function showMessage() {
+                messagePopup.style.display = 'block';
+                setTimeout(() => {
+                    messagePopup.style.display = 'none';
+                }, 4000);
+            }
+
+            window.onload = () => {
+                setInterval(showMessage, 5000);
+            };
+
+            // Enviar mensaje
+            sendMessageButton.addEventListener('click', () => {
+                const message = userMessage.value;
+                if (message) {
+                    // Mostrar el mensaje del usuario
+                    chatBody.innerHTML += `<p><strong>Tú:</strong> ${message}</p>`;
+
+                    // Simular respuesta del bot
+                    setTimeout(() => {
+                        chatBody.innerHTML += `<p><strong>Bot:</strong> Claro que si, estoy validando la información</p>`;
+                        chatBody.scrollTop = chatBody.scrollHeight; // Scroll automático
+                    }, 1000);
+
+                    userMessage.value = ''; // Limpiar input
+                    chatBody.scrollTop = chatBody.scrollHeight; // Scroll automático
+                }
+            });
+
+             // SECCION DEL CHAT BOT
+
+                setTimeout(function () {
+                    calendar.render();
+                }, 100);
+
+                // // Mostrar el modal
+                // $('#appointmentModal').modal('show');
+
+                // Cerrar el modal
+                $('#appointmentModal').on('hidden.bs.modal', function () {
+                    // Aquí no es necesario quitar 'inert' ya que no lo aplicamos al modal
+                    // Si quieres manejar el foco de manera personalizada, lo puedes hacer aquí.
+                });
+
+                // Función para obtener la sesión del usuario
+                function getUserSession() {
+                    const isGuest = localStorage.getItem("isGuest");
+
+                    if (isGuest === "true") {
+                        const user = localStorage.getItem("user");
+                        console.log('Estado de isGuest:', isGuest);
+
+                        if (user) {
+                            $('#userGreeting').text(`Hola, ${user}`);
+                        } else {
+                            $('#userGreeting').text("Hola, Invitado");
+                        }
+                    } else {
+                        window.location.href = "../../pages/loguin/login.html"; // Redirigir al login si no es un invitado
+                    }
+                }
+
+                // Cargar contenido de navbar y footer
+                $('#footer').load('../footer/footer.html');
+
+                // Obtener la sesión del usuario
+                getUserSession();
+
+                });
+ </script>
+    </body>
+
+</html>

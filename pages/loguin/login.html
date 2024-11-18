@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>JJ-CC loguin</title>
+    <!-- inject:css -->
+    <link rel="stylesheet" href="../../dist/css/vendor.styles.css">
+    <link rel="stylesheet" href="../../dist/css/demo/light-template.css">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="../../dist/images/favicon.png" />
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="container-fluid page-body-wrapper full-page-wrapper">
+            <div class="user-auth-v3 h-100">
+                <div class="row no-gutters">
+                    <div class="col-lg-4">
+                        <div class="user-auth-content login">
+                            <div class="row " style="display: flex; justify-content: space-start;">
+                                <img src="../../dist/images/light-logo-mb.png" width="100px" alt="JJ-CC">
+                                <div style="margin-top: 2rem; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+                                    <h3 class="auth-title">Sign in</h3>
+                                </div>
+                            </div>
+                            <div class="row no-gutters" style="margin-top: 2rem;">
+                                <div class="col-sm-10 col-lg-10">
+                                    <form class="needs-validation" novalidate>
+                                        <div class="form-group inner-addon">
+                                            <label class="mb-2" for="inputEmail1">Email</label>
+                                            <input type="email" class="form-control" id="inputEmail1"
+                                                placeholder="nombre.apellido@jjcc.com" required>
+                                        </div>
+                                        <div class="form-group inner-addon mb-5">
+                                            <label class="mb-2" for="inputPassword">Contraseña</label>
+                                            <input type="password" class="form-control" id="inputPassword"
+                                                placeholder="* * * * * * * *" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <button type="submit"
+                                                class="btn btn-lg btn-base btn-rounded">Ingresar</button>
+                                        </div>
+                                        <div class="d-block">
+                                            <a href="#" class="text-dark text-capitalize">Forgot Password?</a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 d-none d-md-block">
+                        <div class="auth-right-section login"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End main-container -->
+
+    <!-- inject:js -->
+    <script src="../../dist/js/vendor.base.js"></script>
+    <script src="../../dist/js/vendor.bundle.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page-->
+    <script src="../../dist/js/components/light-double-sidebar/common-msb.js"></script>
+    <script src="../../dist/js/vendor-override/tooltip.js"></script>
+    <!-- Agregar SweetAlert desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- End custom js for this page-->
+
+    <script>
+
+        function validateSession(username, password) {
+            // Validar que el email es válido
+            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            const paramsCompany = username.split("@");
+
+            switch (true) {
+                case (password === "fisio2024"):
+                    // Guardar en localStorage
+                    localStorage.setItem("user", paramsCompany[0]);
+                    localStorage.setItem("isGuest", "true");
+                    window.location.href = "../../index.html";
+                    break;
+
+                case (paramsCompany.length === 2 && paramsCompany[1] !== "jcc.com"):
+                    Swal.fire({
+                        icon: 'error',
+                        title: '¡Ups!',
+                        text: 'El usuario no es de la compañia',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    break;
+
+                case (!emailPattern.test(username)):
+                    Swal.fire({
+                        icon: 'error',
+                        title: '¡Ups!',
+                        text: 'Por favor ingrese un email válido.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    break;
+                default:
+                    // Mostrar mensaje de error usando SweetAlert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Usuario o contraseña inválidos',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    break;
+            }
+        }
+
+        document.querySelector("form").addEventListener("submit", function (event) {
+            event.preventDefault(); // Evita el envío del formulario
+
+            // Obtener los valores de los campos
+            const username = document.getElementById("inputEmail1").value;
+            const password = document.getElementById("inputPassword").value;
+
+            validateSession(username, password)
+        });
+    </script>
+
+
+</body>
+
+</html>
